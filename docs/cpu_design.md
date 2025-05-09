@@ -40,4 +40,14 @@ I'm creating a brain!
 
 5. **Write Back (WB)**  
    Write result back to Register File
+---
+##  Branching Logic Planning
 
+- Decided to include branching support from the start (no delays later)
+- Need to support instructions like: `BEQ`, `JMP`
+- Will require:
+  - Comparator module (e.g., check if `R1 == R2`)
+  - MUX to select next PC (normal or branch target)
+  - Immediate field or jump address logic
+  - Control signal: `Branch`, `Jump`, `PCSrc`
+- Block diagram will include branching paths in PC logic
