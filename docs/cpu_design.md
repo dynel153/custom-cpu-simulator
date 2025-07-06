@@ -244,6 +244,19 @@ Step 3: Bit Merging
 
 Instruction fetch logic is now complete and fully functional. Ready to proceed to Decode Stage.
 
+#### PC Addressing Example (Word-Aligned Access)
+
+| PC Decimal | PC (32-bit Binary)                    | `pc[7:2]` (Index) | What It Does                |
+| ---------- | ------------------------------------- | ----------------- | --------------------------- |
+| `0`        | `00000000_00000000_00000000_00000000` | `000000`          | Instruction 0               |
+| `4`        | `00000000_00000000_00000000_00000100` | `000001`          | Instruction 1               |
+| `8`        | `00000000_00000000_00000000_00001000` | `000010`          | Instruction 2               |
+| `12`       | `00000000_00000000_00000000_00001100` | `000011`          | Instruction 3               |
+| `16`       | `00000000_00000000_00000000_00010000` | `000100`          | Instruction 4               |
+| `20`       | `00000000_00000000_00000000_00010100` | `000101`          | Instruction 5               |
+| ...        | ...                                   | ...               | ...                         |
+| `252`      | `00000000_00000000_00000000_11111100` | `111111`          | Instruction 63 (last entry) |
+
 
       
 ## 2. **Instruction Decode + Pseudo Register File Integration**
