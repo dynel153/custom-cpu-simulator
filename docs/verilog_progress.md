@@ -54,3 +54,46 @@
     ```
 
  =======================
+ 
+ ## Progress Log — July 7, 2025
+Created the register file module for the decoding stage:
+ - Defined a 32-register array, each 32-bits wide: reg [31:0] registers [0:31];
+ - Used rs and rt inputs as read addresses and rd as the write address
+ - Outputs Read_Data and Read_Data2 reflect the values of registers[rs] and registers[rt]
+ - Used 'assign' statements for continuous output from the register array
+ - Created an always @(posedge clk) block to handle conditional write-back
+ - Ensured register 0 is hardwired to zero by initializing it in an initial block
+ - Prevented writes to register 0 with a conditional guard (write_a != 5'b00000)
+ - Used $display to log read values before write-back and updates after write
+
+Learned today:
+ - How to structure a register file in Verilog using modular design
+ - Proper use of assign vs procedural assignment
+ - That inputs cannot be reassigned inside a module
+ - Correct usage of initial vs always blocks
+ - Best practices for preventing register overwrites (like locking register 0)
+ - Syntax rules for if/else, begin/end, and $display formatting
+ - How to simulate hardware logic in a readable and traceable way
+
+=======================
+
+## Progress Log — July 8, 2025
+Finalized the register file implementation and ensured simulation behavior matched expectations:
+ - After reviewing yesterday’s version, I realized that any uninitialized register would output undefined values (xxxxxxxx) in simulation.
+ - To fix this, I wrote a for loop inside an `initial` block to explicitly initialize all 32 registers to zero at the start of simulation.
+ - I removed unnecessary assign aliases like `read_da` and `read_da2` to make the code cleaner and reduce confusion.
+ - I also removed simulation-specific logic that could interfere with integration into a full system later, keeping only the essential outputs.
+ - Corrected syntax issues in the initial block (fixed for-loop and used 32'h00000000)
+ - Replaced undefined variable 'write_a' with properly scoped 'rd'
+ - Used non-blocking assignment (<=) consistently inside the always block
+ - Prevented writes to register 0 by checking (rd == 5'b00000) and forcing it to 0
+ - Confirmed register 0 value was preserved during all operations
+ - Made code simulation-friendly using an initial block to initialize all registers to zero
+
+Learned today:
+ - Initial blocks are for simulation only and are ignored in hardware (FPGAs)
+ - Register 0 must be explicitly preserved and cannot rely on initial blocks for synthesis
+ - Assigning too frequently or unnecessarily can slow down hardware due to extra logic
+ - assign statements outside of always blocks run in parallel (order doesn’t matter), but order matters inside always blocks depending on blocking vs non-blocking usage
+ - A reset signal is necessary for real hardware to safely initialize values
+ - Simulation values like xxxxxxxx mean undefined and will appear if no initialization occurs
