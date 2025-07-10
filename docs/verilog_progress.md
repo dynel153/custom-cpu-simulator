@@ -97,3 +97,23 @@ Learned today:
  - assign statements outside of always blocks run in parallel (order doesn’t matter), but order matters inside always blocks depending on blocking vs non-blocking usage
  - A reset signal is necessary for real hardware to safely initialize values
  - Simulation values like xxxxxxxx mean undefined and will appear if no initialization occurs
+ 
+=======================
+
+## Progress Log — July 9, 2025
+Tested the register file module using a testbench and validated its behavior under simulated clock cycles:
+ - Connected the register file into a testbench and simulated multiple read/write sequences
+ - Wrote test cases to verify that register 0 remains unchanged even when write-enable is high and data is supplied
+ - Confirmed that regular registers (e.g., register 2) accept and store written data correctly
+ - Observed output logs using $display to confirm behavior on every clock cycle
+ - Used test patterns with controlled timing delays to check when values settle and updates occur
+ - Noticed repeated output lines were due to unchanged signals being sampled on each posedge of the clock
+ - Planned to reduce clutter in future logs by aligning testbench delays (#5 instead of #10) with clock timing
+
+Learned today:
+ - The always block will trigger on every posedge of the clock, even if inputs haven't changed
+ - Simulation logs can show repeated behavior unless timing is tightly controlled
+ - Writing to register 0 is blocked correctly, and this protection holds across all test cases
+ - Real hardware does not stop at the end of an initial block, so a $finish statement is needed in testbenches to cleanly exit
+ - Icarus Verilog has quirks with variable declarations — integer loop counters must be declared outside unnamed blocks to avoid SystemVerilog-only errors
+ - Understanding what each line of output means helps confirm the correctness of module design

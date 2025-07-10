@@ -1,5 +1,4 @@
 
-
 module register_file (
   input clk,                      // Clock signal
   input CNTRL_RS,                // Control signal indicating whether to write
@@ -14,10 +13,11 @@ module register_file (
 
   // Define 32 general-purpose registers, 32 bits each
   reg [31:0] registers [0:31];
+  
+  integer i; // remove intenger i from the loop because iverilog don't support it 
 
-  // Initialize all registers to start at zero using for loop
+  // Initialize all registers to start at zero using for loop; Note: This initial block is for simulation only. Real hardware should use a reset signal.
   initial begin
-    integer i;
     for ( i = 0; i < 32; i = i + 1) begin
       registers[i] = 32'h0000000;
     end
@@ -48,3 +48,4 @@ module register_file (
   end
 
 endmodule
+
