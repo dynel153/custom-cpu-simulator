@@ -767,6 +767,7 @@ Execution stage is now structured with realistic logic blocks. Ready to test ope
 
 - This cleanly expresses the intent: only allow PC to update when **neither memory control signal is active**.
 - The NOR gate ensures simplicity, robustness, and accuracy even if the design evolves later.
+- This is true becaue in a multi-cycle CPU, instructions go through each stage one at a time. You don’t want to start fetching the next instruction (PC update) while the current one is still in its memory stage — that would break the instruction flow. So PC_WE is gated until the memory stage completes, then goes high.
 
 #### Diagram Phase Completion Summary (6/29/2025)
 - The full CPU diagram is now complete.
