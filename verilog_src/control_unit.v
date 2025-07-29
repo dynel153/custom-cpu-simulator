@@ -29,7 +29,7 @@ assign control_word = (control_uo[full_code] !== 10'bx) ? control_uo[full_code] 
 
 // Load control signal definitions from external file at simulation start
 initial begin 
-  $readmemh ("control_unit_test.hex", control_uo);
+  $readmemh ("control_unit_ram.hex", control_uo);
   $display ("CONTROL UNIT INITIALIZED");
 end
 
@@ -42,7 +42,7 @@ end
 // [1]    MEM_TR      : Select memory output for write-back
 // [0]    CNTRL_RS    : Register file write enable
 
-// Assign individual control signals based on bits from control_word
+// Assign individual control signals based on bits from control_uo
 assign ALU_OP    = control_word[CNTRL_WIDTH-1:CNTRL_WIDTH-4];  // ALU operation
 assign ALU_Src   = control_word[CNTRL_WIDTH-5];                // ALU input source (register/immediate)
 assign Branch    = control_word[CNTRL_WIDTH-6];                // Branch signal

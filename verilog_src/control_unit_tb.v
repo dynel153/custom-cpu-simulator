@@ -31,7 +31,7 @@ module CU_TEST;
       // Test ADD instruction (opcode=000000, funct=100000)
       op_code = 6'b000000;
       func_code = 6'b100000;
-      $display("Testing ADD instruction");
+      $display("INSTRUCTION CODE (ADDR): %h", full_code);
       #10;
 
       // Test SUB instruction (opcode=000000, funct=100010)
