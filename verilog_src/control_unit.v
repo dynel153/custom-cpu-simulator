@@ -29,7 +29,7 @@ assign control_word = (control_uo[full_code] !== 10'bx) ? control_uo[full_code] 
 
 // Load control signal definitions from external file at simulation start
 initial begin 
-  $readmemh ("control_unit.hex", control_uo);
+  $readmemh ("control_unit_test.hex", control_uo);
   $display ("CONTROL UNIT INITIALIZED");
 end
 
