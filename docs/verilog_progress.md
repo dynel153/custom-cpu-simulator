@@ -117,3 +117,79 @@ Learned today:
  - Real hardware does not stop at the end of an initial block, so a $finish statement is needed in testbenches to cleanly exit
  - Icarus Verilog has quirks with variable declarations — integer loop counters must be declared outside unnamed blocks to avoid SystemVerilog-only errors
  - Understanding what each line of output means helps confirm the correctness of module design
+
+=======================
+
+## Progress Log — July 17, 2025
+Began implementation of the control unit and successfully created a ROM-based design to generate control signals:
+ - Created a 12-bit instruction ID from opcode and function code to use as an address for control signal lookup
+ - Defined a 4,096-entry ROM (`reg [9:0] control_uo [0:4095]`) to map each instruction ID to a 10-bit control word
+ - Loaded control signals into the ROM using `$readmemh("control_unit.hex", control_uo);`
+ - Used `assign` statements to slice each control signal cleanly from the ROM entry
+ - Implemented logic to suppress program counter updates during memory access using `PC_WE = ~|{MEM_RS, MEM_WS};`
+ - Used an `always @(*)` block with `$display` to print active control signals in simulation for debugging
+ - Carefully structured code to separate `initial`, `assign`, and `always` blocks to avoid simulation errors
+
+Learned today:
+ - `assign` statements cannot go inside `initial` or `always` blocks; they must be in the main body of the module
+ - `$display` can only be used inside procedural blocks like `always` or `initial`, not in the global scope
+ - Attempting to display a whole array like `control_uo` will cause errors — instead, index it properly (e.g., `control_uo[full_code]`)
+ - ROMs are commonly used in multi-cycle CPU control units to simplify instruction decoding
+ - Control signal gating (like pausing PC updates during memory ops) is essential for correct instruction timing
+ - The 12-bit instruction ID allows for 0x000 to 0xFFF address range, giving 4,096 possible control mappings
+
+## Progress Log — July 21, 2025
+Today, the control unit hex memory was finalized and formatted properly for Verilog simulation compatibility:
+ - Converted old memory dump into a flat `$readmemh`-compatible format
+ - Ensured each line number corresponds to a memory address (0–4095), and every line contains one 4-digit control word
+ - Populated specific instruction addresses with correct 10-bit control words
+ - Padded all unused lines with `0000` to prevent undefined behavior
+ - Renamed file to `control_unit_test.hex` and loaded it into the design folder
+ - Updated the control unit code to use `localparam CNTRL_WIDTH = 10;` for scalable signal width
+ - Rewrote all signal slicing logic to reference `CNTRL_WIDTH`, ensuring flexible indexing for future expansion
+ - Added fallback logic to assign a default NOP control word (`10'b0000000000`) if an uninitialized instruction address is accessed
+
+Learned today:
+ - `$readmemh` in Verilog requires one value per line; the line number equals the address
+ - Padding unused addresses with NOP (`0000`) prevents errors during simulation
+ - Each control word must be exactly the correct width (10 bits) and properly aligned
+ - Memory-mapped control units offer clean, modular decoding for each instruction
+ - Parameterizing the control width makes the design scalable and avoids hardcoding signal lengths
+ - Referencing signals like `control_word[CNTRL_WIDTH-5]` instead of raw indexes improves maintainability
+
+### Control Word Bit Mapping (from MSB to LSB):
+```
+[9:6]  ALU_OP     // ALU operation type
+[5]    ALU_Src    // ALU source select: 0 = reg, 1 = imm
+[4]    Branch     // Branch enable
+[3]    MEM_RS     // Memory read enable
+[2]    MEM_WS     // Memory write enable
+[1]    MEM_TR     // Memory-to-register select
+[0]    CNTRL_RS   // Register file write enable
+```
+
+This mapping is used to generate each hex value stored in the control ROM.
+Each instruction is uniquely mapped to a 12-bit address (`full_code`) and drives these 10 control signals.
+The use of `localparam CNTRL_WIDTH` makes it easy to expand the control word format in future versions of the CPU.
+
+=======================
+
+## Progress Log — July 28, 2025
+Today, the testbench for the control unit was successfully written and reviewed:
+ - Created a new testbench module `CU_TEST` to simulate control unit behavior
+ - Declared input `reg` values and output `wire` signals to match the `control_unit` interface
+ - Instantiated the `control_unit` with all connections correctly mapped
+ - Wrote an `initial begin` block to simulate a series of instruction tests (ADD, SUB, OR, LW, etc.)
+ - Used `#10;` time delays between each input to allow control logic to settle and display
+ - Relied on the main module’s `$display` debugging logic to view internal control signal values
+ - Added `$finish;` to the end of the testbench to terminate the simulation cleanly
+
+Learned today:
+ - Testbenches use `reg` for inputs because they are assigned inside procedural blocks
+ - `wire` is used for outputs because those are driven by the DUT (design under test)
+ - Verilog requires semicolons and proper quote matching — small syntax issues can break simulation
+ - `$finish;` is essential to automatically end the simulation once test cases are complete
+ - Simulation only runs as far as the time control and active instructions go; adding delay ensures outputs are visible before advancing
+
+This testbench is now ready for simulation and functional verification of control unit ROM behavior.
+
